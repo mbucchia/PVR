@@ -271,6 +271,15 @@ typedef enum pvrTrackedDeviceType_
 	pvrTrackedDevice_Tracker1 = 0x00000010,
 	pvrTrackedDevice_Tracker2 = 0x00000020,
 	pvrTrackedDevice_Tracker3 = 0x00000040,
+	pvrTrackedDevice_Tracker4 = 0x00000080,
+	pvrTrackedDevice_Tracker5 = 0x00000100,
+	pvrTrackedDevice_Tracker6 = 0x00000200,
+	pvrTrackedDevice_Tracker7 = 0x00000400,
+	pvrTrackedDevice_Tracker8 = 0x00000800,
+	pvrTrackedDevice_Tracker9 = 0x00001000,
+	pvrTrackedDevice_Tracker10 = 0x00002000,
+	pvrTrackedDevice_Tracker11 = 0x00004000,
+	pvrTrackedDevice_Tracker12 = 0x00008000,
 
 	pvrTrackedDevice_Custom1 = 0x00010000,
 	pvrTrackedDevice_Custom2 = 0x00020000,
@@ -314,6 +323,29 @@ typedef enum pvrTrackedDeviceProp_
 	pvrTrackedDeviceProp_Manufacturer_String,
 	pvrTrackedDeviceProp_VenderId_int,
 	pvrTrackedDeviceProp_ProductId_int,
+	pvrTrackedDeviceProp_RenderModelName_String,
+	pvrTrackedDeviceProp_InputProfilePath_String,
+	pvrTrackedDeviceProp_ControllerType_String,
+	pvrTrackedDeviceProp_Serial_String,
+	pvrTrackedDeviceProp_ModeLabel_String,
+	pvrTrackedDeviceProp_Firmware_UpdateAvailable_Bool,
+	pvrTrackedDeviceProp_Firmware_ForceUpdateRequired_Bool,
+	pvrTrackedDeviceProp_Firmware_ManualUpdate_Bool,
+	pvrTrackedDeviceProp_Firmware_ManualUpdateURL_String,
+	pvrTrackedDeviceProp_Firmware_ProgrammingTarget_String,
+	pvrTrackedDeviceProp_TrackingFirmwareVersion_String,
+	pvrTrackedDeviceProp_FirmwareVersion_Uint64,
+	pvrTrackedDeviceProp_RegisteredDeviceType_String,
+	pvrTrackedDeviceProp_HardwareRevision_Uint64,
+	pvrTrackedDeviceProp_HardwareRevision_String,
+	pvrTrackedDeviceProp_ResourceRoot_String,
+	pvrTrackedDeviceProp_FPGAVersion_Uint64,
+	pvrTrackedDeviceProp_VRCVersion_Uint64,
+	pvrTrackedDeviceProp_RadioVersion_Uint64,
+	pvrTrackedDeviceProp_DongleVersion_Uint64,
+	pvrTrackedDeviceProp_Identifiable_Bool,
+	pvrTrackedDeviceProp_ConnectedWirelessDongle_String,
+	pvrTrackedDeviceProp_InputButtons_Uint64,
 
 	pvrTrackedDeviceProp_Private = 0x0000FFFF,
 	pvrTrackedDeviceProp_Max = 0x0FFFFFFF,
@@ -506,6 +538,12 @@ typedef struct PVR_ALIGNAS(8) pvrEyeRenderInfo_
 	pvrRecti     DistortedViewport;
 } pvrEyeRenderInfo;
 
+typedef struct PVR_ALIGNAS(8) pvrEyeTrackingInfo_
+{
+	pvrVector2f  GazeTan[pvrEye_Count]; //tan of eye gaze.
+	double TimeInSeconds;
+} pvrEyeTrackingInfo;
+
 // texture type
 typedef enum pvrTextureType_
 {
@@ -597,6 +635,12 @@ typedef struct PVR_ALIGNAS(4) pvrMirrorTextureDesc_
 typedef struct pvrTextureSwapChainData* pvrTextureSwapChain;
 typedef struct pvrMirrorTextureData* pvrMirrorTexture;
 
+typedef struct PVR_ALIGNAS(4) pvrDepthProjectionDesc_ {
+	float Projection22;
+	float Projection23;
+	float Projection32;
+} pvrDepthProjectionDesc;
+
 enum {
 	pvrMaxLayerCount = 16
 };
@@ -606,6 +650,9 @@ typedef enum pvrLayerType_
 	pvrLayerType_Disabled = 0,         ///< disabled.
 	pvrLayerType_EyeFov = 1,         ///< pvrLayerEyeFov.
 	pvrLayerType_Quad = 2,         ///< pvrLayerQuad.
+	pvrLayerType_EyeFovDepth = 3,         ///< pvrLayerEyeFovDepth.
+
+	pvrLayerType_ScreenDebug = 0x0000ffff,
 	pvrLayerType_EnumSize = 0x7fffffff ///< Force type int32_t.
 } pvrLayerType;
 
@@ -639,6 +686,25 @@ typedef struct PVR_ALIGNAS(PVR_PTR_SIZE) pvrLayerEyeFov_
 	double              SensorSampleTime;
 } pvrLayerEyeFov;
 
+typedef struct PVR_ALIGNAS(PVR_PTR_SIZE) pvrLayerEyeFovDepth_
+{
+	pvrLayerHeader      Header;
+
+	pvrTextureSwapChain  ColorTexture[pvrEye_Count];
+
+	pvrViewPort         Viewport[pvrEye_Count];
+
+	pvrFovPort          Fov[pvrEye_Count];
+
+	pvrPosef            RenderPose[pvrEye_Count];
+
+	double              SensorSampleTime;
+
+	pvrTextureSwapChain DepthTexture[pvrEye_Count];
+
+	pvrDepthProjectionDesc DepthProjectionDesc;
+} pvrLayerEyeFovDepth;
+
 typedef struct PVR_ALIGNAS(PVR_PTR_SIZE) pvrLayerQuad_
 {
 	pvrLayerHeader      Header;
@@ -654,12 +720,24 @@ typedef struct PVR_ALIGNAS(PVR_PTR_SIZE) pvrLayerQuad_
 
 } pvrLayerQuad;
 
+typedef struct PVR_ALIGNAS(PVR_PTR_SIZE) pvrLayerScreenDebug_
+{
+	pvrLayerHeader      Header;
+
+	pvrTextureSwapChain  ColorTexture;
+
+	/// Specifies the ColorTexture sub-rect UV coordinates.
+	pvrViewPort          Viewport;
+} pvrLayerScreenDebug;
+
 
 typedef union pvrLayer_Union_
 {
 	pvrLayerHeader      Header;
 	pvrLayerEyeFov      EyeFov;
+	pvrLayerEyeFovDepth EyeFovDepth;
 	pvrLayerQuad		Quad;
+	pvrLayerScreenDebug ScreenDebug;
 } pvrLayer_Union;
 
 typedef enum pvrButton_
@@ -670,7 +748,13 @@ typedef enum pvrButton_
 	pvrButton_Grip = 0x00000008,
 	pvrButton_TouchPad = 0x00000010,
 	pvrButton_JoyStick = 0x00000020,
-	
+	pvrButton_A = 0x00000040,
+	pvrButton_B = 0x00000080,
+	pvrButton_FingerIndex = 0x00000100,
+	pvrButton_FingerMiddle = 0x00000200,
+	pvrButton_FingerRing = 0x00000400,
+	pvrButton_FingerPinky = 0x00000800,
+
 	pvrButton_EnumSize = 0xffffffff ///< \internal Force type uint32_t.
 } pvrButton;
 
@@ -686,8 +770,29 @@ typedef struct PVR_ALIGNAS(PVR_PTR_SIZE) pvrInputState_
 	float			Grip[2];
 	pvrVector2f		TouchPad[2];
 	pvrVector2f		JoyStick[2];
+
+	float			GripForce[2];
+	float			TouchPadForce[2];
+	float           fingerIndex[2];
+	float           fingerMiddle[2];
+	float           fingerRing[2];
+	float           fingerPinky[2];
 } pvrInputState;
 
+enum {
+	PVR_MAX_SKELETAL_BONE_COUNT = 32,
+};
+typedef struct PVR_ALIGNAS(PVR_PTR_SIZE) pvrSkeletalData_
+{
+	pvrPosef boneTransforms[PVR_MAX_SKELETAL_BONE_COUNT];
+	uint32_t boneCount;
+}pvrSkeletalData;
+
+enum pvrSkeletalMotionRange {
+	pvrSkeletalMotionRange_WithController = 0,
+	pvrSkeletalMotionRange_WithoutController = 1,
+	pvrSkeletalMotionRange_Max
+};
 
 typedef enum _pvrTrackingOrigin_
 {

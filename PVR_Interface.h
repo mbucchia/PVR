@@ -10,7 +10,7 @@ Copyright   :   Copyright 2017 Pimax, Inc. All Rights reserved.
 #include "PVR_Types.h"
 #include "PVRVersion.h"
 
-typedef struct _pvrInterfaceV14
+typedef struct _pvrInterfaceV22
 {
 	pvrResult (*initialise)();
 	void(*shutdown)();
@@ -49,8 +49,9 @@ typedef struct _pvrInterfaceV14
 	pvrResult(*commitTextureSwapChain)(pvrHmdHandle hmdh, pvrTextureSwapChain chain);
 	void(*destroyTextureSwapChain)(pvrHmdHandle hmdh, pvrTextureSwapChain chain);
 	void(*destroyMirrorTexture)(pvrHmdHandle hmdh, pvrMirrorTexture mirrorTexture);
-	pvrResult(*submitFrame)(pvrHmdHandle hmdh, long long frameIndex,
+	pvrResult(*endFrame)(pvrHmdHandle hmdh, long long frameIndex,
 		pvrLayerHeader const * const * layerPtrList, unsigned int layerCount);
+	pvrResult(*beginFrame)(pvrHmdHandle hmdh, long long frameIndex);
 	void* (*getDxGlInterface)(const char* api);
 
 	void (*Matrix4f_Projection)(pvrFovPort fov, float znear, float zfar, pvrBool right_handled, pvrMatrix4f* outMat);
@@ -83,9 +84,19 @@ typedef struct _pvrInterfaceV14
 	pvrQuatf(*getTrackedDeviceQuatfProperty)(pvrHmdHandle hmdh, pvrTrackedDeviceType device, pvrTrackedDeviceProp prop, pvrQuatf def_val);
 
 	unsigned int(*getEyeHiddenAreaMesh)(pvrHmdHandle hmdh, pvrEyeType eye, pvrVector2f* outVertexBuffer, unsigned int bufferCount);
-}pvrInterfaceV14;
 
-typedef pvrInterfaceV14 pvrInterface;
+	int64_t(*getInt64Config)(pvrHmdHandle hmdh, const char* key, int64_t def_val);
+	pvrResult(*setInt64Config)(pvrHmdHandle hmdh, const char* key, int64_t val);
+
+	pvrResult (*getSkeletalData)(pvrHmdHandle hmdh, pvrTrackedDeviceType device, pvrSkeletalMotionRange range, pvrSkeletalData* data);
+	pvrResult (*getGripLimitSkeletalData)(pvrHmdHandle hmdh, pvrTrackedDeviceType device, pvrSkeletalData* data);
+
+	int64_t(*getTrackedDeviceInt64Property)(pvrHmdHandle hmdh, pvrTrackedDeviceType device, pvrTrackedDeviceProp prop, int64_t def_val);
+
+	pvrResult(*getEyeTrackingInfo)(pvrHmdHandle hmdh, double absTime, pvrEyeTrackingInfo* outInfo);
+}pvrInterfaceV22;
+
+typedef pvrInterfaceV22 pvrInterface;
 
 typedef pvrInterface* (*getPvrInterface_Fn)(uint32_t major_ver, uint32_t minor_ver);
 

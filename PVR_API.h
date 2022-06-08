@@ -124,6 +124,15 @@ static PVR_FORCE_INLINE pvrResult pvr_getEyeRenderInfo(pvrSessionHandle sessionH
 	}
 	return sessionHandle->envh->pvr_interface->getEyeRenderInfo(sessionHandle->hmdh, eye, outInfo);
 }
+
+//get tracking info for eye
+static PVR_FORCE_INLINE pvrResult pvr_getEyeTrackingInfo(pvrSessionHandle sessionHandle, double absTime, pvrEyeTrackingInfo* outInfo) {
+	if (!sessionHandle || !outInfo) {
+		return pvr_invalid_param;
+	}
+	return sessionHandle->envh->pvr_interface->getEyeTrackingInfo(sessionHandle->hmdh, absTime, outInfo);
+}
+
 //get hmd descriptions.
 static PVR_FORCE_INLINE pvrResult pvr_getHmdInfo(pvrSessionHandle sessionHandle, pvrHmdInfo* outInfo) {
 	if (!sessionHandle || !outInfo) {
@@ -167,6 +176,20 @@ static PVR_FORCE_INLINE pvrResult pvr_setIntConfig(pvrSessionHandle sessionHandl
 		return pvr_invalid_param;
 	}
 	return sessionHandle->envh->pvr_interface->setIntConfig(sessionHandle->hmdh, key, val);
+}
+//get int64_t config value.
+static PVR_FORCE_INLINE int64_t pvr_getInt64Config(pvrSessionHandle sessionHandle, const char* key, int64_t def_val) {
+	if (!sessionHandle || !key) {
+		return def_val;
+	}
+	return sessionHandle->envh->pvr_interface->getInt64Config(sessionHandle->hmdh, key, def_val);
+}
+//set int64_t config value.
+static PVR_FORCE_INLINE pvrResult pvr_setInt64Config(pvrSessionHandle sessionHandle, const char* key, int64_t val) {
+	if (!sessionHandle || !key) {
+		return pvr_invalid_param;
+	}
+	return sessionHandle->envh->pvr_interface->setInt64Config(sessionHandle->hmdh, key, val);
 }
 //set vector3f config value.
 static PVR_FORCE_INLINE pvrResult pvr_setVector3fConfig(pvrSessionHandle sessionHandle, const char* key, pvrVector3f val) {
@@ -286,6 +309,13 @@ static PVR_FORCE_INLINE int pvr_getTrackedDeviceIntProperty(pvrSessionHandle ses
 	}
 	return sessionHandle->envh->pvr_interface->getTrackedDeviceIntProperty(sessionHandle->hmdh, device, prop, def_val);
 }
+//get device int64 type property.
+static PVR_FORCE_INLINE int64_t pvr_getTrackedDeviceInt64Property(pvrSessionHandle sessionHandle, pvrTrackedDeviceType device, pvrTrackedDeviceProp prop, int64_t def_val) {
+	if (!sessionHandle) {
+		return def_val;
+	}
+	return sessionHandle->envh->pvr_interface->getTrackedDeviceInt64Property(sessionHandle->hmdh, device, prop, def_val);
+}
 //get device string type property.
 static PVR_FORCE_INLINE int pvr_getTrackedDeviceStringProperty(pvrSessionHandle sessionHandle, pvrTrackedDeviceType device, pvrTrackedDeviceProp prop, char* val, int size) {
 	if (!sessionHandle) {
@@ -346,6 +376,21 @@ static PVR_FORCE_INLINE pvrResult pvr_triggerHapticPulse(pvrSessionHandle sessio
 	return sessionHandle->envh->pvr_interface->triggerHapticPulse(sessionHandle->hmdh, device, intensity);
 }
 
+static PVR_FORCE_INLINE pvrResult pvr_getSkeletalData(pvrSessionHandle sessionHandle, pvrTrackedDeviceType device, pvrSkeletalMotionRange range, pvrSkeletalData* data) {
+	if (!sessionHandle || !data) {
+		return pvr_invalid_param;
+	}
+	return sessionHandle->envh->pvr_interface->getSkeletalData(sessionHandle->hmdh, device, range, data);
+}
+
+static PVR_FORCE_INLINE pvrResult pvr_getGripLimitSkeletalData(pvrSessionHandle sessionHandle, pvrTrackedDeviceType device, pvrSkeletalData* data)
+{
+	if (!sessionHandle || !data) {
+		return pvr_invalid_param;
+	}
+	return sessionHandle->envh->pvr_interface->getGripLimitSkeletalData(sessionHandle->hmdh, device, data);
+}
+
 static PVR_FORCE_INLINE pvrDispStateType pvr_getDisplayState(pvrEnvHandle envHandle, uint32_t edid_vid, uint32_t edid_pid) {
 	if (!envHandle) {
 		return pvrDispStateType::pvrDispState_None;
@@ -398,12 +443,19 @@ static PVR_FORCE_INLINE void pvr_destroyMirrorTexture(pvrSessionHandle sessionHa
 	sessionHandle->envh->pvr_interface->destroyMirrorTexture(sessionHandle->hmdh, mirrorTexture);
 }
 //submit rendered layers to PVR Runtime, to be showned on the HMD.
-static PVR_FORCE_INLINE pvrResult pvr_submitFrame(pvrSessionHandle sessionHandle, long long frameIndex,
+static PVR_FORCE_INLINE pvrResult pvr_endFrame(pvrSessionHandle sessionHandle, long long frameIndex,
 	pvrLayerHeader const * const * layerPtrList, unsigned int layerCount) {
 	if (!sessionHandle || !layerPtrList) {
 		return pvr_invalid_param;
 	}
-	return sessionHandle->envh->pvr_interface->submitFrame(sessionHandle->hmdh, frameIndex, layerPtrList, layerCount);
+	return sessionHandle->envh->pvr_interface->endFrame(sessionHandle->hmdh, frameIndex, layerPtrList, layerCount);
+}
+//submit rendered layers to PVR Runtime, to be showned on the HMD.
+static PVR_FORCE_INLINE pvrResult pvr_beginFrame(pvrSessionHandle sessionHandle, long long frameIndex) {
+	if (!sessionHandle) {
+		return pvr_invalid_param;
+	}
+	return sessionHandle->envh->pvr_interface->beginFrame(sessionHandle->hmdh, frameIndex);
 }
 //get the time the frame(indicate by frameIndex) will be show on the display.
 //for low latency, use this time to get the tracking state.

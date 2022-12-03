@@ -10,7 +10,7 @@ Copyright   :   Copyright 2017 Pimax, Inc. All Rights reserved.
 #include "PVR_Types.h"
 #include "PVRVersion.h"
 
-typedef struct _pvrInterfaceV22
+typedef struct _pvrInterfaceV23
 {
 	pvrResult (*initialise)();
 	void(*shutdown)();
@@ -52,6 +52,9 @@ typedef struct _pvrInterfaceV22
 	pvrResult(*endFrame)(pvrHmdHandle hmdh, long long frameIndex,
 		pvrLayerHeader const * const * layerPtrList, unsigned int layerCount);
 	pvrResult(*beginFrame)(pvrHmdHandle hmdh, long long frameIndex);
+	pvrResult(*waitToBeginFrame)(pvrHmdHandle hmdh, long long frameIndex);
+	pvrResult(*submitFrame)(pvrHmdHandle hmdh, long long frameIndex, pvrLayerHeader const * const * layerPtrList, unsigned int layerCount);
+
 	void* (*getDxGlInterface)(const char* api);
 
 	void (*Matrix4f_Projection)(pvrFovPort fov, float znear, float zfar, pvrBool right_handled, pvrMatrix4f* outMat);
@@ -94,9 +97,10 @@ typedef struct _pvrInterfaceV22
 	int64_t(*getTrackedDeviceInt64Property)(pvrHmdHandle hmdh, pvrTrackedDeviceType device, pvrTrackedDeviceProp prop, int64_t def_val);
 
 	pvrResult(*getEyeTrackingInfo)(pvrHmdHandle hmdh, double absTime, pvrEyeTrackingInfo* outInfo);
-}pvrInterfaceV22;
 
-typedef pvrInterfaceV22 pvrInterface;
+}pvrInterfaceV23;
+
+typedef pvrInterfaceV23 pvrInterface;
 
 typedef pvrInterface* (*getPvrInterface_Fn)(uint32_t major_ver, uint32_t minor_ver);
 

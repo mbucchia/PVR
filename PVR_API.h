@@ -442,6 +442,17 @@ static PVR_FORCE_INLINE void pvr_destroyMirrorTexture(pvrSessionHandle sessionHa
 	}
 	sessionHandle->envh->pvr_interface->destroyMirrorTexture(sessionHandle->hmdh, mirrorTexture);
 }
+
+//deprecated.
+//submit rendered layers to PVR Runtime, to be showned on the HMD.
+static PVR_FORCE_INLINE pvrResult pvr_submitFrame(pvrSessionHandle sessionHandle, long long frameIndex,
+	pvrLayerHeader const * const * layerPtrList, unsigned int layerCount) {
+	if (!sessionHandle || !layerPtrList) {
+		return pvr_invalid_param;
+	}
+	return sessionHandle->envh->pvr_interface->submitFrame(sessionHandle->hmdh, frameIndex, layerPtrList, layerCount);
+}
+
 //submit rendered layers to PVR Runtime, to be showned on the HMD.
 static PVR_FORCE_INLINE pvrResult pvr_endFrame(pvrSessionHandle sessionHandle, long long frameIndex,
 	pvrLayerHeader const * const * layerPtrList, unsigned int layerCount) {
@@ -456,6 +467,13 @@ static PVR_FORCE_INLINE pvrResult pvr_beginFrame(pvrSessionHandle sessionHandle,
 		return pvr_invalid_param;
 	}
 	return sessionHandle->envh->pvr_interface->beginFrame(sessionHandle->hmdh, frameIndex);
+}
+//wait to begin frame, must be call before beginFrame and endFrame.
+static PVR_FORCE_INLINE pvrResult pvr_waitToBeginFrame(pvrSessionHandle sessionHandle, long long frameIndex) {
+	if (!sessionHandle) {
+		return pvr_invalid_param;
+	}
+	return sessionHandle->envh->pvr_interface->waitToBeginFrame(sessionHandle->hmdh, frameIndex);
 }
 //get the time the frame(indicate by frameIndex) will be show on the display.
 //for low latency, use this time to get the tracking state.

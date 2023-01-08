@@ -1,0 +1,48 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SimpleVRDemoDX11", "SimpleVRDemoDX11\SimpleVRDemoDX11.vcxproj", "{A2FC1935-16DB-4229-AED7-3C999A469BF6}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectXTK_Desktop_2015", "DirectXTK\DirectXTK_Desktop_2015.vcxproj", "{E0B52AE7-E160-4D32-BF3F-910B785E5A8E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SimplePVRDriver", "SimplePVRDriver\SimplePVRDriver.vcxproj", "{0DC2C82E-E8A3-45B5-AFE7-97A0EF81E863}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A2FC1935-16DB-4229-AED7-3C999A469BF6}.Debug|x64.ActiveCfg = Debug|x64
+		{A2FC1935-16DB-4229-AED7-3C999A469BF6}.Debug|x64.Build.0 = Debug|x64
+		{A2FC1935-16DB-4229-AED7-3C999A469BF6}.Debug|x86.ActiveCfg = Debug|Win32
+		{A2FC1935-16DB-4229-AED7-3C999A469BF6}.Debug|x86.Build.0 = Debug|Win32
+		{A2FC1935-16DB-4229-AED7-3C999A469BF6}.Release|x64.ActiveCfg = Release|x64
+		{A2FC1935-16DB-4229-AED7-3C999A469BF6}.Release|x64.Build.0 = Release|x64
+		{A2FC1935-16DB-4229-AED7-3C999A469BF6}.Release|x86.ActiveCfg = Release|Win32
+		{A2FC1935-16DB-4229-AED7-3C999A469BF6}.Release|x86.Build.0 = Release|Win32
+		{E0B52AE7-E160-4D32-BF3F-910B785E5A8E}.Debug|x64.ActiveCfg = Debug|x64
+		{E0B52AE7-E160-4D32-BF3F-910B785E5A8E}.Debug|x64.Build.0 = Debug|x64
+		{E0B52AE7-E160-4D32-BF3F-910B785E5A8E}.Debug|x86.ActiveCfg = Debug|Win32
+		{E0B52AE7-E160-4D32-BF3F-910B785E5A8E}.Debug|x86.Build.0 = Debug|Win32
+		{E0B52AE7-E160-4D32-BF3F-910B785E5A8E}.Release|x64.ActiveCfg = Release|x64
+		{E0B52AE7-E160-4D32-BF3F-910B785E5A8E}.Release|x64.Build.0 = Release|x64
+		{E0B52AE7-E160-4D32-BF3F-910B785E5A8E}.Release|x86.ActiveCfg = Release|Win32
+		{E0B52AE7-E160-4D32-BF3F-910B785E5A8E}.Release|x86.Build.0 = Release|Win32
+		{0DC2C82E-E8A3-45B5-AFE7-97A0EF81E863}.Debug|x64.ActiveCfg = Debug|x64
+		{0DC2C82E-E8A3-45B5-AFE7-97A0EF81E863}.Debug|x64.Build.0 = Debug|x64
+		{0DC2C82E-E8A3-45B5-AFE7-97A0EF81E863}.Debug|x86.ActiveCfg = Debug|Win32
+		{0DC2C82E-E8A3-45B5-AFE7-97A0EF81E863}.Debug|x86.Build.0 = Debug|Win32
+		{0DC2C82E-E8A3-45B5-AFE7-97A0EF81E863}.Release|x64.ActiveCfg = Release|x64
+		{0DC2C82E-E8A3-45B5-AFE7-97A0EF81E863}.Release|x64.Build.0 = Release|x64
+		{0DC2C82E-E8A3-45B5-AFE7-97A0EF81E863}.Release|x86.ActiveCfg = Release|Win32
+		{0DC2C82E-E8A3-45B5-AFE7-97A0EF81E863}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

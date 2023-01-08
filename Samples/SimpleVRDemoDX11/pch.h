@@ -73,8 +73,15 @@
 #include "WICTextureLoader.h"
 
 //pvr sdk header files.
+#ifdef USE_PVR
 #include "PVR_API.h"
 #include "PVR_API_D3D.h"
+#else
+#define XR_USE_PLATFORM_WIN32
+#define XR_USE_GRAPHICS_API_D3D11
+#include <openxr/openxr.h>
+#include <openxr/openxr_platform.h>
+#endif
 
 namespace DX
 {

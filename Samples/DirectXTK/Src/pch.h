@@ -96,6 +96,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <stdexcept>
 
 #include <malloc.h>
 #include <stdint.h>

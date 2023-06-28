@@ -306,6 +306,14 @@ typedef enum pvrTrackedDeviceCap_
 	pvrTrackedDeviceCap_Position = 0x0002,
 } pvrTrackedDeviceCap;
 
+typedef enum pvrHmdTrackingStyle_
+{
+	pvrHmdTrackingStyle_Unknown = 0,
+	pvrHmdTrackingStyle_Imu = 1,
+	pvrHmdTrackingStyle_Lighthouse = 2,
+	pvrHmdTrackingStyle_InsideOutCameras = 3,
+} pvrHmdTrackingStyle;
+
 //properties of tracked device.
 typedef enum pvrTrackedDeviceProp_
 {
@@ -346,6 +354,10 @@ typedef enum pvrTrackedDeviceProp_
 	pvrTrackedDeviceProp_Identifiable_Bool,
 	pvrTrackedDeviceProp_ConnectedWirelessDongle_String,
 	pvrTrackedDeviceProp_InputButtons_Uint64,
+	pvrTrackedDeviceProp_Audio_PlaybackDeviceId_String,
+	pvrTrackedDeviceProp_Audio_RecordingDeviceId_String,
+	pvrTrackedDeviceProp_Prop_HmdTrackingStyle_Int,
+	pvrTrackedDeviceProp_ScreenState_Bool,
 
 	pvrTrackedDeviceProp_Private = 0x0000FFFF,
 	pvrTrackedDeviceProp_Max = 0x0FFFFFFF,
@@ -750,6 +762,8 @@ typedef enum pvrButton_
 	pvrButton_JoyStick = 0x00000020,
 	pvrButton_A = 0x00000040,
 	pvrButton_B = 0x00000080,
+	pvrButton_X = pvrButton_A,
+	pvrButton_Y = pvrButton_B,
 	pvrButton_FingerIndex = 0x00000100,
 	pvrButton_FingerMiddle = 0x00000200,
 	pvrButton_FingerRing = 0x00000400,

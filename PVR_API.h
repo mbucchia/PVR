@@ -368,12 +368,12 @@ static PVR_FORCE_INLINE pvrResult pvr_getInputState(pvrSessionHandle sessionHand
 	return sessionHandle->envh->pvr_interface->getInputState(sessionHandle->hmdh, inputState);
 }
 
-//trigger haptic pulse for device, intensity (range from 0.0 to 1.0)
-static PVR_FORCE_INLINE pvrResult pvr_triggerHapticPulse(pvrSessionHandle sessionHandle, pvrTrackedDeviceType device, float intensity) {
-	if (!sessionHandle || intensity < 0) {
+//trigger haptic pulse for device, amplitude (range from 0.0 to 1.0), frequency not used, must set to 0, reserve for future use.
+static PVR_FORCE_INLINE pvrResult pvr_triggerHapticPulse(pvrSessionHandle sessionHandle, pvrTrackedDeviceType device, float amplitude, float durationSeconds, float frequency) {
+	if (!sessionHandle || amplitude < 0 || durationSeconds < 0 || frequency < 0) {
 		return pvr_invalid_param;
 	}
-	return sessionHandle->envh->pvr_interface->triggerHapticPulse(sessionHandle->hmdh, device, intensity);
+	return sessionHandle->envh->pvr_interface->triggerHapticPulse(sessionHandle->hmdh, device, amplitude, durationSeconds, frequency);
 }
 
 static PVR_FORCE_INLINE pvrResult pvr_getSkeletalData(pvrSessionHandle sessionHandle, pvrTrackedDeviceType device, pvrSkeletalMotionRange range, pvrSkeletalData* data) {

@@ -10,7 +10,7 @@ Copyright   :   Copyright 2017 Pimax, Inc. All Rights reserved.
 #include "PVR_Types.h"
 #include "PVRVersion.h"
 
-typedef struct _pvrInterfaceV23
+typedef struct _pvrInterfaceV24
 {
 	pvrResult (*initialise)();
 	void(*shutdown)();
@@ -71,7 +71,7 @@ typedef struct _pvrInterfaceV23
 	pvrResult (*getTrackerDesc)(pvrHmdHandle hmdh, unsigned int idx, pvrTrackerDesc* desc);
 	pvrResult (*getTrackerPose)(pvrHmdHandle hmdh, unsigned int idx, pvrTrackerPose* pose);
 
-	pvrResult (*triggerHapticPulse)(pvrHmdHandle hmdh, pvrTrackedDeviceType device, float intensity);
+	pvrResult (*triggerHapticPulse)(pvrHmdHandle hmdh, pvrTrackedDeviceType device, float amplitude, float durationSeconds, float frequency);
 
 	pvrVector3f(*getVector3fConfig)(pvrHmdHandle hmdh, const char* key, pvrVector3f def_val);
 	pvrResult(*setVector3fConfig)(pvrHmdHandle hmdh, const char* key, pvrVector3f val);
@@ -98,9 +98,9 @@ typedef struct _pvrInterfaceV23
 
 	pvrResult(*getEyeTrackingInfo)(pvrHmdHandle hmdh, double absTime, pvrEyeTrackingInfo* outInfo);
 
-}pvrInterfaceV23;
+}pvrInterfaceV24;
 
-typedef pvrInterfaceV23 pvrInterface;
+typedef pvrInterfaceV24 pvrInterface;
 
 typedef pvrInterface* (*getPvrInterface_Fn)(uint32_t major_ver, uint32_t minor_ver);
 

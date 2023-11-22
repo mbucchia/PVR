@@ -14,7 +14,7 @@ Copyright   :   Copyright 2017 Pimax, Inc. All Rights reserved.
 #endif
 
 #define PVR_MAJOR_VERSION 1
-#define PVR_MINOR_VERSION 24
+#define PVR_MINOR_VERSION 26
 #define PVR_PATCH_VERSION 1
 #define PVR_BUILD_NUMBER  1
 

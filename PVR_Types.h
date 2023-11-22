@@ -358,6 +358,9 @@ typedef enum pvrTrackedDeviceProp_
 	pvrTrackedDeviceProp_Audio_RecordingDeviceId_String,
 	pvrTrackedDeviceProp_Prop_HmdTrackingStyle_Int,
 	pvrTrackedDeviceProp_ScreenState_Bool,
+	pvrTrackedDeviceProp_SecondsFromVsyncToPhotons_Float,
+	pvrTrackedDeviceProp_IpdRangeMin_Float,
+	pvrTrackedDeviceProp_IpdRangeMax_Float,
 
 	pvrTrackedDeviceProp_Private = 0x0000FFFF,
 	pvrTrackedDeviceProp_Max = 0x0FFFFFFF,
@@ -663,6 +666,7 @@ typedef enum pvrLayerType_
 	pvrLayerType_EyeFov = 1,         ///< pvrLayerEyeFov.
 	pvrLayerType_Quad = 2,         ///< pvrLayerQuad.
 	pvrLayerType_EyeFovDepth = 3,         ///< pvrLayerEyeFovDepth.
+	pvrLayerType_VST = 4,
 
 	pvrLayerType_ScreenDebug = 0x0000ffff,
 	pvrLayerType_EnumSize = 0x7fffffff ///< Force type int32_t.
@@ -673,7 +677,8 @@ typedef enum pvrLayerFlags_
 	/// pvrLayerFlag_TextureOriginAtBottomLeft: the opposite is TopLeft.
 	/// Generally this is false for D3D, true for OpenGL.
 	pvrLayerFlag_TextureOriginAtBottomLeft = 0x01,
-	pvrLayerFlag_HeadLocked = 0x02
+	pvrLayerFlag_HeadLocked = 0x02,
+	pvrLayerFlag_Opaque = 0x04
 } pvrLayerFlags;
 
 typedef struct PVR_ALIGNAS(PVR_PTR_SIZE) pvrLayerHeader_
@@ -731,6 +736,13 @@ typedef struct PVR_ALIGNAS(PVR_PTR_SIZE) pvrLayerQuad_
 	pvrVector2f         QuadSize;
 
 } pvrLayerQuad;
+
+
+typedef struct PVR_ALIGNAS(PVR_PTR_SIZE) pvrLayerVST_
+{
+	pvrLayerHeader      Header;
+} pvrLayerVST;
+
 
 typedef struct PVR_ALIGNAS(PVR_PTR_SIZE) pvrLayerScreenDebug_
 {
@@ -814,6 +826,104 @@ typedef enum _pvrTrackingOrigin_
 	pvrTrackingOrigin_FloorLevel,
 	pvrTrackingOrigin_Count
 } pvrTrackingOrigin;
+
+
+typedef struct PVR_ALIGNAS(4) pvrPerfStatsPerCompositorFrame_ {
+	long long HmdVsyncIndex;
+
+	///
+	/// Application stats
+	///
+
+	long long AppFrameIndex;
+	int AppDroppedFrameCount;
+	int AppStaleFrameCount;
+	int AppDiscardFrameCount;
+	float AppMotionToPhotonLatency;
+	double AppVsyncTime;
+	float AppStartTimeFromVsync;//when return from pvr_waitToBeginFrame
+	float AppBeginTimeFromVsync;//when return from pvr_beginFrame
+	float AppEndTimeFromVsync;//when return from pvr_endFrame 
+	float AppDoneTimeFromVsync;//when frame gpu work done
+	float AppGpuElapsedTime;
+	///
+	/// SDK Compositor stats
+	///
+	long long CompositorFrameIndex;
+	int CompositorDroppedFrameCount;
+	float CompositorLatency;
+	double HmdVsyncTime;
+	float CompositorCpuBeginTimeFromVsync;
+	float CompositorCpuEndTimeFromVsync;
+	float CompositorGpuDoneTimeFromVsync;
+	float CompositorGpuElapsedTime;
+
+	///
+	/// Async Smart Smoothing stats (ASS)
+	///
+
+	pvrBool AssIsActive;
+
+	int AssActivatedToggleCount;
+	int AssPresentedFrameCount;
+	int AssFailedFrameCount;
+
+} pvrPerfStatsPerCompositorFrame;
+
+enum { pvrMaxProvidedFrameStats = 5 };
+
+typedef struct PVR_ALIGNAS(4) pvrPerfStats_ {
+	/// The performance entries will be ordered in reverse chronological order such that the
+	/// first entry will be the most recent one.
+	pvrPerfStatsPerCompositorFrame FrameStats[pvrMaxProvidedFrameStats];
+	int FrameStatsCount;
+
+	pvrBool AssIsAvailable;//Async smart smoothing.
+
+	uint32_t VisibleProcessId;
+} pvrPerfStats;
+
+typedef enum pvrHiddenAreaMeshType_ {
+	pvrHiddenAreaMesh_HiddenArea = 0, ///< Triangle list covering parts that are hidden to users
+	pvrHiddenAreaMesh_VisibleArea = 1, ///< Triangle list covering parts that are visible to users
+	pvrHiddenAreaMesh_BorderLine = 2, ///< Line list that draws the boundary visible to users
+	pvrHiddenAreaMesh_VisibleRectangle = 3, ///< Axis-aligned rectangle fit in visible region
+										///< 4x vertices: TopLeft, TopRight, BottomRight, BottomLeft
+
+	pvrHiddenAreaMesh_EnumSize = 0x7fffffff ///< \internal Force type int32_t.
+} pvrHiddenAreaMeshType;
+
+typedef enum pvrVSTType_
+{
+	pvrVSTTypeNone = 0,
+	pvrVSTTypeMono = 1,
+	pvrVSTTypeStereo = 2,
+	pvrVSTTypeMax
+} pvrVSTType;
+
+typedef enum pvrVSTStreamFormat_
+{
+	pvrVST_FORMAT_UNKNOWN = 0,
+	pvrVST_FORMAT_NV12 = 1,
+	pvrVST_FORMAT_MAX
+}pvrVSTStreamFormat;
+
+typedef enum pvrVSTDistortionType_
+{
+	pvrVST_DISTORTION_UNKNOWN = 0,
+	pvrVST_DISTORTION_FISHEYE4 = 1,
+	pvrVST_DISTORTION_MAX
+}pvrVSTDistortionType;
+
+typedef struct PVR_ALIGNAS(4) pvrVSTStreamFrame_
+{
+	uint32_t frameIdx;
+	double exposureTime;
+	uint32_t width;
+	uint32_t height;
+	uint32_t stride;
+	uint8_t* buffer;
+}pvrVSTStreamFrame;
 
 typedef void* pvrHmdHandle;
 

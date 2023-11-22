@@ -475,6 +475,23 @@ static PVR_FORCE_INLINE pvrResult pvr_waitToBeginFrame(pvrSessionHandle sessionH
 	}
 	return sessionHandle->envh->pvr_interface->waitToBeginFrame(sessionHandle->hmdh, frameIndex);
 }
+
+static PVR_FORCE_INLINE pvrResult pvr_getPerfStats(pvrSessionHandle sessionHandle, pvrPerfStats* outStats)
+{
+	if (!sessionHandle) {
+		return pvr_invalid_param;
+	}
+	return sessionHandle->envh->pvr_interface->getPerfStats(sessionHandle->hmdh, outStats);
+}
+
+static PVR_FORCE_INLINE pvrResult pvr_resetPerfStats(pvrSessionHandle sessionHandle)
+{
+	if (!sessionHandle) {
+		return pvr_invalid_param;
+	}
+	return sessionHandle->envh->pvr_interface->resetPerfStats(sessionHandle->hmdh);
+}
+
 //get the time the frame(indicate by frameIndex) will be show on the display.
 //for low latency, use this time to get the tracking state.
 static PVR_FORCE_INLINE double pvr_getPredictedDisplayTime(pvrSessionHandle sessionHandle, long long frameIndex) {
@@ -493,11 +510,59 @@ static PVR_FORCE_INLINE pvrResult pvr_getFovTextureSize(pvrSessionHandle session
 
 //get eye hidden area mesh.
 //return the request vertex count.
-static PVR_FORCE_INLINE unsigned int pvr_getEyeHiddenAreaMesh(pvrSessionHandle sessionHandle, pvrEyeType eye, pvrVector2f* outVertexBuffer, unsigned int bufferCount) {
+static PVR_FORCE_INLINE unsigned int pvr_getEyeHiddenAreaMesh(pvrSessionHandle sessionHandle, pvrEyeType eye, pvrHiddenAreaMeshType type, pvrVector2f* outVertexBuffer, unsigned int bufferCount) {
 	if (!sessionHandle) {
 		return 0;
 	}
-	return sessionHandle->envh->pvr_interface->getEyeHiddenAreaMesh(sessionHandle->hmdh, eye, outVertexBuffer, bufferCount);
+	return sessionHandle->envh->pvr_interface->getEyeHiddenAreaMesh2(sessionHandle->hmdh, eye, type, outVertexBuffer, bufferCount);
+}
+
+static PVR_FORCE_INLINE pvrVSTType pvr_getVSTType(pvrSessionHandle sessionHandle)
+{
+	if (!sessionHandle) {
+		return pvrVSTTypeNone;
+	}
+	return sessionHandle->envh->pvr_interface->getVSTType(sessionHandle->hmdh);
+}
+
+static PVR_FORCE_INLINE pvrVSTStreamFormat pvr_getVSTStreamFormat(pvrSessionHandle sessionHandle)
+{
+	if (!sessionHandle) {
+		return pvrVST_FORMAT_UNKNOWN;
+	}
+	return sessionHandle->envh->pvr_interface->getVSTStreamFormat(sessionHandle->hmdh);
+}
+
+static PVR_FORCE_INLINE pvrResult pvr_getVSTCameraDistortionParams(pvrSessionHandle sessionHandle, uint32_t cameraIdx, pvrVSTDistortionType* type, float k[8])
+{
+	if (!sessionHandle || !type || !k) {
+		return pvr_invalid_param;
+	}
+	return sessionHandle->envh->pvr_interface->getVSTCameraDistortionParams(sessionHandle->hmdh, cameraIdx, type, k);
+}
+
+static PVR_FORCE_INLINE pvrResult pvr_getVSTCameraIntrinsics(pvrSessionHandle sessionHandle, uint32_t cameraIdx, uint32_t* pWidth, uint32_t* pHeight, pvrVector2f *pFocalLength, pvrVector2f *pCenter)
+{
+	if (!sessionHandle || !pWidth || !pHeight || !pFocalLength || !pCenter) {
+		return pvr_invalid_param;
+	}
+	return sessionHandle->envh->pvr_interface->getVSTCameraIntrinsics(sessionHandle->hmdh, cameraIdx, pWidth, pHeight, pFocalLength, pCenter);
+}
+
+static PVR_FORCE_INLINE pvrResult pvr_getVSTCameraExtrinsics(pvrSessionHandle sessionHandle, uint32_t cameraIdx, pvrPosef* pCameraToHmdPose)
+{
+	if (!sessionHandle || !pCameraToHmdPose) {
+		return pvr_invalid_param;
+	}
+	return sessionHandle->envh->pvr_interface->getVSTCameraExtrinsics(sessionHandle->hmdh, cameraIdx, pCameraToHmdPose);
+}
+
+static PVR_FORCE_INLINE pvrResult pvr_getVSTStreamFrame(pvrSessionHandle sessionHandle, uint32_t frameIdx, pvrVSTStreamFrame* frame)
+{
+	if (!sessionHandle || !frame) {
+		return pvr_invalid_param;
+	}
+	return sessionHandle->envh->pvr_interface->getVSTStreamFrame(sessionHandle->hmdh, frameIdx, frame);
 }
 
 //calculate eye pose from head pose and eye offset.
@@ -529,21 +594,6 @@ static PVR_FORCE_INLINE void pvrPosef_FlipHandedness(pvrEnvHandle envHandle, con
 	return envHandle->pvr_interface->Posef_FlipHandedness(inPose, outPose);
 }
 
-//get client count, including current clent.
-static PVR_FORCE_INLINE int pvr_getClientCount(pvrEnvHandle envHandle) {
-	if (!envHandle) {
-		return 0;
-	}
-	return envHandle->pvr_interface->getClientCount();
-}
-
-//get client pids, including current clent. return client counts.
-static PVR_FORCE_INLINE int pvr_getClientPids(pvrEnvHandle envHandle, uint32_t pids[], int buf_count) {
-	if (!envHandle) {
-		return 0;
-	}
-	return envHandle->pvr_interface->getClientPids(pids, buf_count);
-}
 //log message.
 static PVR_FORCE_INLINE void pvr_logMessage(pvrEnvHandle envHandle, pvrLogLevel level, const char* message) {
 	if (!envHandle) {

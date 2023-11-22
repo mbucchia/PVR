@@ -10,7 +10,7 @@ Copyright   :   Copyright 2017 Pimax, Inc. All Rights reserved.
 #include "PVR_Types.h"
 #include "PVRVersion.h"
 
-typedef struct _pvrInterfaceV24
+typedef struct _pvrInterfaceV26
 {
 	pvrResult (*initialise)();
 	void(*shutdown)();
@@ -63,8 +63,8 @@ typedef struct _pvrInterfaceV24
 	void(*Posef_FlipHandedness)(const pvrPosef* inPose, pvrPosef* outPose);
 
 	pvrDispStateType(*getDisplayState)(uint32_t edid_vid, uint32_t edid_pid);
-	int(*getClientCount)();
-	int(*getClientPids)(uint32_t pids[], int buf_count);
+	void* reserved0;
+	void* reserved1;
 	void (*logMessage)(pvrLogLevel level, const char* message);
 
 	unsigned int (*getTrackerCount)(pvrHmdHandle hmdh);
@@ -98,9 +98,23 @@ typedef struct _pvrInterfaceV24
 
 	pvrResult(*getEyeTrackingInfo)(pvrHmdHandle hmdh, double absTime, pvrEyeTrackingInfo* outInfo);
 
-}pvrInterfaceV24;
+	pvrResult(*getPerfStats)(pvrHmdHandle hmdh, pvrPerfStats* outStats);
+	pvrResult(*resetPerfStats)(pvrHmdHandle hmdh);
+	unsigned int(*getEyeHiddenAreaMesh2)(pvrHmdHandle hmdh, pvrEyeType eye, pvrHiddenAreaMeshType type, pvrVector2f* outVertexBuffer, unsigned int bufferCount);
 
-typedef pvrInterfaceV24 pvrInterface;
+	pvrVSTType(*getVSTType)(pvrHmdHandle hmdh);
+	pvrVSTStreamFormat(*getVSTStreamFormat)(pvrHmdHandle hmdh);
+	pvrResult(*getVSTCameraDistortionParams)(pvrHmdHandle hmdh, uint32_t cameraIdx, pvrVSTDistortionType* type, float k[8]);
+	pvrResult(*getVSTCameraIntrinsics)(pvrHmdHandle hmdh, uint32_t cameraIdx, uint32_t* pWidth, uint32_t* pHeight, pvrVector2f *pFocalLength, pvrVector2f *pCenter);
+	pvrResult(*getVSTCameraExtrinsics)(pvrHmdHandle hmdh, uint32_t cameraIdx, pvrPosef* pCameraToHmdPose);
+	pvrResult(*getVSTStreamFrame)(pvrHmdHandle hmdh, uint32_t frameIdx, pvrVSTStreamFrame* frame);
+	void* reserved2;
+	void* reserved3;
+	void* reserved4;
+	void* reserved5;
+}pvrInterfaceV26;
+
+typedef pvrInterfaceV26 pvrInterface;
 
 typedef pvrInterface* (*getPvrInterface_Fn)(uint32_t major_ver, uint32_t minor_ver);
 

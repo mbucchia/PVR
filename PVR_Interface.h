@@ -10,7 +10,7 @@ Copyright   :   Copyright 2017 Pimax, Inc. All Rights reserved.
 #include "PVR_Types.h"
 #include "PVRVersion.h"
 
-typedef struct _pvrInterfaceV26
+typedef struct _pvrInterfaceV32
 {
 	pvrResult (*initialise)();
 	void(*shutdown)();
@@ -112,9 +112,23 @@ typedef struct _pvrInterfaceV26
 	void* reserved3;
 	void* reserved4;
 	void* reserved5;
-}pvrInterfaceV26;
+	void* reserved6;
+	void* reserved7;
+	void* reserved8;
+	void* reserved9;
+	void* reserved10;
+	void* reserved11;
+	void* reserved12;
+	void* reserved13;
+	void* reserved14;
+	pvrResult(*getHandTrackingSkeletalData)(pvrHmdHandle hmdh, pvrHandDeviceType hand, double absTime, pvrSkeletalData* data);
+	void* reserved15;
+	void* reserved16;
+	pvrResult(*getTrackingStateByPid)(pvrHmdHandle hmdh, double absTime, uint32_t pid, pvrTrackingState* state);
+	pvrResult(*getHandTrackingInputState)(pvrHmdHandle hmdh, pvrHandTrackingInputState* inputState);
+}pvrInterfaceV32;
 
-typedef pvrInterfaceV26 pvrInterface;
+typedef pvrInterfaceV32 pvrInterface;
 
 typedef pvrInterface* (*getPvrInterface_Fn)(uint32_t major_ver, uint32_t minor_ver);
 

@@ -10,6 +10,7 @@ Copyright   :   Copyright 2017 Pimax, Inc. All Rights reserved.
 
 #include "PVR_Interface.h"
 #include "windows.h"
+#include <stdio.h>
 
 typedef struct _pvrEnv
 {
@@ -278,6 +279,13 @@ static PVR_FORCE_INLINE pvrResult pvr_getTrackingState(pvrSessionHandle sessionH
 		return pvr_invalid_param;
 	}
 	return sessionHandle->envh->pvr_interface->getTrackingState(sessionHandle->hmdh, absTime, state);
+}
+
+static PVR_FORCE_INLINE pvrResult pvr_getTrackingStateByPid(pvrSessionHandle sessionHandle, double absTime, uint32_t pid, pvrTrackingState* state) {
+	if (!sessionHandle || !state) {
+		return pvr_invalid_param;
+	}
+	return sessionHandle->envh->pvr_interface->getTrackingStateByPid(sessionHandle->hmdh, absTime, pid, state);
 }
 //get pose state of a tracked device, should check StatusFlags to see if the oritation or position is valid.
 static PVR_FORCE_INLINE pvrResult pvr_getTrackedDevicePoseState(pvrSessionHandle sessionHandle, pvrTrackedDeviceType device, double absTime, pvrPoseStatef* state) {
@@ -565,6 +573,23 @@ static PVR_FORCE_INLINE pvrResult pvr_getVSTStreamFrame(pvrSessionHandle session
 	return sessionHandle->envh->pvr_interface->getVSTStreamFrame(sessionHandle->hmdh, frameIdx, frame);
 }
 
+static PVR_FORCE_INLINE pvrResult pvr_getHandTrackingSkeletalData(pvrSessionHandle sessionHandle, pvrHandDeviceType hand, double absTime, pvrSkeletalData* data)
+{
+	if (!sessionHandle || !data) {
+		return pvr_invalid_param;
+	}
+	return sessionHandle->envh->pvr_interface->getHandTrackingSkeletalData(sessionHandle->hmdh, hand, absTime, data);
+}
+
+static PVR_FORCE_INLINE pvrResult pvr_getHandTrackingInputState(pvrSessionHandle sessionHandle, pvrHandTrackingInputState* inputState)
+{
+	if (!sessionHandle || !inputState) {
+		return pvr_invalid_param;
+	}
+	return sessionHandle->envh->pvr_interface->getHandTrackingInputState(sessionHandle->hmdh, inputState);
+}
+
+
 //calculate eye pose from head pose and eye offset.
 static PVR_FORCE_INLINE void pvr_calcEyePoses(pvrEnvHandle envHandle, pvrPosef headPose, const pvrPosef hmdToEyePose[2], pvrPosef outEyePoses[2]) {
 	if (!envHandle) {
@@ -599,6 +624,16 @@ static PVR_FORCE_INLINE void pvr_logMessage(pvrEnvHandle envHandle, pvrLogLevel 
 	if (!envHandle) {
 		return;
 	}
+	return envHandle->pvr_interface->logMessage(level, message);
+}
+
+static PVR_FORCE_INLINE void pvr_log(pvrEnvHandle envHandle, pvrLogLevel level, const char* fmt, ...) {
+	char message[1024];
+	va_list args;
+	int n;
+	va_start(args, fmt);
+	n = vsprintf_s(message, fmt, args);
+	va_end(args);
 	return envHandle->pvr_interface->logMessage(level, message);
 }
 

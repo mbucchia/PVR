@@ -361,6 +361,9 @@ typedef enum pvrTrackedDeviceProp_
 	pvrTrackedDeviceProp_SecondsFromVsyncToPhotons_Float,
 	pvrTrackedDeviceProp_IpdRangeMin_Float,
 	pvrTrackedDeviceProp_IpdRangeMax_Float,
+	pvrTrackedDeviceProp_UniverseId_int,
+	pvrTrackedDeviceProp_SleepMode_Bool,
+	pvrTrackedDeviceProp_SupportsEyeTracking_Bool,
 
 	pvrTrackedDeviceProp_Private = 0x0000FFFF,
 	pvrTrackedDeviceProp_Max = 0x0FFFFFFF,
@@ -493,7 +496,8 @@ typedef enum
 {
 	pvrDispState_None = 0,
 	pvrDispState_Direct,
-	pvrDispState_Extend
+	pvrDispState_Extend,
+	pvrDispState_Virtual
 }pvrDispStateType;
 
 //graphics adapter id, used for multi adapter supporter.
@@ -542,6 +546,7 @@ typedef struct PVR_ALIGNAS(8) pvrHmdStatus
 	pvrBool DisplayLost;
 	pvrBool ServiceReady;
 	pvrBool ShouldQuit;
+	pvrBool HasInputFocus; //when True, should hide any input representations such as hands and controllers.
 }pvrHmdStatus;
 
 // render info for each eye.
@@ -557,12 +562,15 @@ typedef struct PVR_ALIGNAS(8) pvrEyeTrackingInfo_
 {
 	pvrVector2f  GazeTan[pvrEye_Count]; //tan of eye gaze.
 	double TimeInSeconds;
+	float	ConvergenceDistance;//add field in 1-30 version
+	float blink[pvrEye_Count];
 } pvrEyeTrackingInfo;
 
 // texture type
 typedef enum pvrTextureType_
 {
 	pvrTexture_2D,              ///< 2D textures.
+	pvrTexture_Cube,
 	pvrTexture_Count,
 	pvrTexture_EnumSize = 0x7fffffff 
 } pvrTextureType;
@@ -667,6 +675,8 @@ typedef enum pvrLayerType_
 	pvrLayerType_Quad = 2,         ///< pvrLayerQuad.
 	pvrLayerType_EyeFovDepth = 3,         ///< pvrLayerEyeFovDepth.
 	pvrLayerType_VST = 4,
+	pvrLayerType_Cube = 5,
+	pvrLayerType_Cylinder = 6,
 
 	pvrLayerType_ScreenDebug = 0x0000ffff,
 	pvrLayerType_EnumSize = 0x7fffffff ///< Force type int32_t.
@@ -678,7 +688,8 @@ typedef enum pvrLayerFlags_
 	/// Generally this is false for D3D, true for OpenGL.
 	pvrLayerFlag_TextureOriginAtBottomLeft = 0x01,
 	pvrLayerFlag_HeadLocked = 0x02,
-	pvrLayerFlag_Opaque = 0x04
+	pvrLayerFlag_Opaque = 0x04,
+	pvrLayerFlag_FullyTransparent = 0x08
 } pvrLayerFlags;
 
 typedef struct PVR_ALIGNAS(PVR_PTR_SIZE) pvrLayerHeader_
@@ -743,6 +754,29 @@ typedef struct PVR_ALIGNAS(PVR_PTR_SIZE) pvrLayerVST_
 	pvrLayerHeader      Header;
 } pvrLayerVST;
 
+typedef struct PVR_ALIGNAS(PVR_PTR_SIZE) pvrLayerCylinder_ {
+	pvrLayerHeader Header;
+
+	pvrTextureSwapChain ColorTexture;
+
+	pvrViewPort Viewport;
+
+	pvrPosef CylinderPoseCenter;
+
+	float CylinderRadius;
+
+	float CylinderAngle;
+
+	float CylinderAspectRatio;
+} pvrLayerCylinder;
+
+typedef struct PVR_ALIGNAS(PVR_PTR_SIZE) pvrLayerCube_ {
+	pvrLayerHeader Header;
+
+	pvrQuatf Orientation;
+
+	pvrTextureSwapChain CubeMapTexture;
+} pvrLayerCube;
 
 typedef struct PVR_ALIGNAS(PVR_PTR_SIZE) pvrLayerScreenDebug_
 {
@@ -761,6 +795,9 @@ typedef union pvrLayer_Union_
 	pvrLayerEyeFov      EyeFov;
 	pvrLayerEyeFovDepth EyeFovDepth;
 	pvrLayerQuad		Quad;
+	pvrLayerVST         Vst;
+	pvrLayerCube		Cube;
+	pvrLayerCylinder	Cylinder;
 	pvrLayerScreenDebug ScreenDebug;
 } pvrLayer_Union;
 
@@ -804,6 +841,16 @@ typedef struct PVR_ALIGNAS(PVR_PTR_SIZE) pvrInputState_
 	float           fingerRing[2];
 	float           fingerPinky[2];
 } pvrInputState;
+
+
+typedef struct PVR_ALIGNAS(PVR_PTR_SIZE) pvrHandTrackingInputState_
+{
+	double          TimeInSeconds;
+	pvrBool			IsValid[2];
+	pvrPosef		PointerPose[2];
+	uint32_t        HandStatus[2];
+} pvrHandTrackingInputState;
+
 
 enum {
 	PVR_MAX_SKELETAL_BONE_COUNT = 32,
@@ -905,6 +952,7 @@ typedef enum pvrVSTStreamFormat_
 {
 	pvrVST_FORMAT_UNKNOWN = 0,
 	pvrVST_FORMAT_NV12 = 1,
+	pvrVST_FORMAT_RAW8 = 2,
 	pvrVST_FORMAT_MAX
 }pvrVSTStreamFormat;
 
@@ -924,6 +972,13 @@ typedef struct PVR_ALIGNAS(4) pvrVSTStreamFrame_
 	uint32_t stride;
 	uint8_t* buffer;
 }pvrVSTStreamFrame;
+
+typedef enum pvrHandDeviceType_
+{
+	pvrHand_Left = 0,
+	pvrHand_Right = 1,
+	pvrHand_Count = 2
+}pvrHandDeviceType;
 
 typedef void* pvrHmdHandle;
 
